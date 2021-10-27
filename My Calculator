@@ -7,7 +7,7 @@ class MyCal(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("My Calculator")
-        self.setGeometry(400, 400, 360, 480)
+        self.setFixedSize(360, 480)
         #mainlayout
         self.mainLayout = QVBoxLayout()
         self.setLayout(self.mainLayout)
@@ -22,10 +22,9 @@ class MyCal(QMainWindow):
     def _createDisplay(self):
         # display (number)
         self.display = QLineEdit()
+        self.display.setStyleSheet('background-color : #eaeaea')
         # set font size
-        font = self.display.font()
-        font.setPointSize(50)
-        self.display.setFont(font)
+        
         self.display.setFixedHeight(80)
         self.display.setAlignment(Qt.AlignRight)
         self.display.setReadOnly(True)
@@ -43,31 +42,45 @@ class MyCal(QMainWindow):
                   '4', '5', '6', '*',
                   '7', '8', '9', '-',
                   '=', '0', '.', '+',
-                  'AC','C'}
-
+                  'AC','C', '%'}
         for btn in button:
             self.button[btn] = QPushButton(btn)
             self.button[btn].setFixedHeight(60)
-            self.button[btn].setFont(QFont('Arial', 20))
-
-        self.layout1.addWidget(self.button['1'])
-        self.layout1.addWidget(self.button['2'])
-        self.layout1.addWidget(self.button['3'])
+            if btn != '0':
+                self.button[btn].setFixedWidth(80)
+            else:
+                self.button[btn].setFixedWidth(160)
+            self.button[btn].setFont(QFont('Arial', 25))
+        # set buttons' colour
+        num = {'1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '.'}
+        oper = {'+', '-', '*', '/', '='}
+        func = {'AC', 'C', '%'}
+        for i in num:
+            self.button[i].setStyleSheet("background-color : #9ad3ca")
+        for i in oper:
+            self.button[i].setStyleSheet("background-color : #e0af8c")
+        for i in func:
+            self.button[i].setStyleSheet("background-color : #ceaa7a")
+        
+        self.layout1.addWidget(self.button['AC'])
+        self.layout1.addWidget(self.button['C'])
+        self.layout1.addWidget(self.button['%'])
         self.layout1.addWidget(self.button['/'])
-        self.layout2.addWidget(self.button['4'])
-        self.layout2.addWidget(self.button['5'])
-        self.layout2.addWidget(self.button['6'])
+        self.layout2.addWidget(self.button['7'])
+        self.layout2.addWidget(self.button['8'])
+        self.layout2.addWidget(self.button['9'])
         self.layout2.addWidget(self.button['*'])
-        self.layout3.addWidget(self.button['7'])
-        self.layout3.addWidget(self.button['8'])
-        self.layout3.addWidget(self.button['9'])
+        self.layout3.addWidget(self.button['4'])
+        self.layout3.addWidget(self.button['5'])
+        self.layout3.addWidget(self.button['6'])
         self.layout3.addWidget(self.button['-'])
-        self.layout4.addWidget(self.button['='])
-        self.layout4.addWidget(self.button['0'])
-        self.layout4.addWidget(self.button['.'])
+        self.layout4.addWidget(self.button['1'])
+        self.layout4.addWidget(self.button['2'])
+        self.layout4.addWidget(self.button['3'])
         self.layout4.addWidget(self.button['+'])
-        self.layout5.addWidget(self.button['AC'])
-        self.layout5.addWidget(self.button['C'])
+        self.layout5.addWidget(self.button['0'])
+        self.layout5.addWidget(self.button['.'])
+        self.layout5.addWidget(self.button['='])
 
         self.mainLayout.addLayout(self.layout1)
         self.mainLayout.addLayout(self.layout2)
@@ -99,12 +112,16 @@ class CalculatorCtrl:
         # ensure if operator changed (in case 1+-2) 
         self.sumOpeSign = 0
         self._view.setDisplayText('0')
-
+        # set font size
+        self.font = self._view.display.font()
+        self.font.setPointSize(50)
+        self._view.display.setFont(self.font)
+        
     def _connectSignals(self):
         """connect signals and buttons"""
         for Text, btn in self._view.button.items():
             # text is the button pressed 
-            if Text not in {'=', 'C', 'AC', '+', '-', '*', '/', '.'}:
+            if Text not in {'=', 'C', 'AC', '+', '-', '*', '/', '.', '%'}:
                 btn.clicked.connect(partial(self.Num, Text))
             elif Text in {'+', '-', '*', '/'}:
                 btn.clicked.connect(partial(self.Operator, Text))
@@ -113,6 +130,7 @@ class CalculatorCtrl:
         self._view.button['C'].clicked.connect(self.Clear)
         self._view.button['AC'].clicked.connect(self.AllClear)
         self._view.button['.'].clicked.connect(self.Point)
+        self._view.button['%'].clicked.connect(self.Percent)
         
     def Num(self, text):
         # when input is number
@@ -127,7 +145,8 @@ class CalculatorCtrl:
         else:
             self._view.setDisplayText(numm)
             self.sumOpeSign = 0
-            self.opeSign = False 
+            self.opeSign = False
+        self.fontSize()
     
     def Operator(self, ope):
         # when input is + - * /
@@ -150,20 +169,15 @@ class CalculatorCtrl:
 
         else:
             self.num = self._view.display.text()
-
+        
         self.operator = ope
         self.opeSign = True
         self.sumOpeSign += 1
+        self.fontSize()
 
     def Point(self):
         # when input is .
-        if self.opeSign == True and '.' not in self._view.display.text():
-            # in case 12 + .6 
-            self._view.setDisplayText('0.')
-            self.sumOpeSign = 0
-            self.opeSign = False
-        elif self.opeSign == True:
-            # in case 45.6 + .8
+        if self.opeSign == True:
             self._view.setDisplayText('0.')
             self.sumOpeSign = 0
             self.opeSign = False
@@ -187,8 +201,8 @@ class CalculatorCtrl:
         self._view.setDisplayText(str(self.sumAll))
         self.num  = self.sumAll
         self.opeSign = True 
-        self._view.displayText
-    
+        self.fontSize()
+
     def AllClear(self):
         # AC clear everything
         self.num = 0.0
@@ -199,16 +213,34 @@ class CalculatorCtrl:
         self.opeSign = False
 
         self._view.setDisplayText('0')
+        self.fontSize()
 
     def Clear(self):
         # clear num just pressed(num that appeared on display)
         self._view.setDisplayText('0')
+        self.fontSize()
+
+    def Percent(self):
+        if self._view.displayText() != '0':
+            percent = str(float(self._view.displayText()) / 100)
+            self._view.setDisplayText(percent)
+        self.fontSize()
+        
+    def fontSize(self):
+        if len(str(self._view.display.text())) < 11:
+            self.font.setPointSize(50)
+        else:
+            size = 50 - len(str(self._view.display.text()))
+            self.font.setPointSize(size)
+        self._view.display.setFont(self.font)
 
 def main():
     """Main function"""
     mycalcu = QApplication([])
     # Show the calculator's GUI
     view = MyCal()
+    view.setAttribute(Qt.WA_StyledBackground, True)
+    view.setStyleSheet('background-color : #dfcdbf')
     view.show()
     # Create instances of the model and the controller
     CalculatorCtrl(view=view)
