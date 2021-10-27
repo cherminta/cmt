@@ -23,8 +23,6 @@ class MyCal(QMainWindow):
         # display (number)
         self.display = QLineEdit()
         self.display.setStyleSheet('background-color : #EAEAEA')
-        # set font size
-        
         self.display.setFixedHeight(80)
         self.display.setAlignment(Qt.AlignRight)
         self.display.setReadOnly(True)
@@ -99,8 +97,10 @@ class CalculatorCtrl:
     """Calculator Controller."""
     def __init__(self, view):
         self._view = view
-        # connect signals and buttons
+        # connect signals with buttons
         self._connectSignals()
+        
+        ### set all variables
         self.num = 0.0
         self.newNum = 0.0
         # sum of operator pressed(in case 1+1+1)
@@ -112,6 +112,7 @@ class CalculatorCtrl:
         # ensure if operator changed (in case 1+-2) 
         self.sumOpeSign = 0
         self._view.setDisplayText('0')
+
         # set font size
         self.font = self._view.display.font()
         self.font.setPointSize(50)
@@ -165,7 +166,6 @@ class CalculatorCtrl:
 
             self._view.setDisplayText(str(self.sumAll))
             self.num  = self.sumAll
-            self._view.displayText
 
         else:
             self.num = self._view.display.text()
