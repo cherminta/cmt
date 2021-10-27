@@ -56,11 +56,11 @@ class MyCal(QMainWindow):
         oper = {'+', '-', '*', '/', '='}
         func = {'AC', 'C', '%'}
         for i in num:
-            self.button[i].setStyleSheet("background-color : #9ad3ca")
+            self.button[i].setStyleSheet("background-color : #C3DFD8")
         for i in oper:
-            self.button[i].setStyleSheet("background-color : #e0af8c")
+            self.button[i].setStyleSheet("background-color : #B5D6D6")
         for i in func:
-            self.button[i].setStyleSheet("background-color : #ceaa7a")
+            self.button[i].setStyleSheet("background-color : #C4DBC1")
         
         self.layout1.addWidget(self.button['AC'])
         self.layout1.addWidget(self.button['C'])
@@ -240,7 +240,7 @@ def main():
     # Show the calculator's GUI
     view = MyCal()
     view.setAttribute(Qt.WA_StyledBackground, True)
-    view.setStyleSheet('background-color : #dfcdbf')
+    view.setStyleSheet('background-color : #cbcbd4')
     view.show()
     # Create instances of the model and the controller
     CalculatorCtrl(view=view)
