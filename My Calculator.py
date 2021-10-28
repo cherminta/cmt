@@ -20,7 +20,7 @@ class MyCal(QMainWindow):
         self._createButtons()
 
     def _createDisplay(self):
-        # display (number)
+        # display's box (number)
         self.display = QLineEdit()
         self.display.setStyleSheet('background-color : #EAEAEA')
         self.display.setFixedHeight(80)
